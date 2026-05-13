@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from './auth.service';
 import { User, Role } from '../models/user.model';
 
@@ -8,8 +8,12 @@ describe('AuthService', () => {
 
   beforeEach(() => {
     localStorage.clear();
+    const mockRouter = { navigate: jasmine.createSpy('navigate') };
     TestBed.configureTestingModule({
-      providers: [AuthService, provideRouter([])]
+      providers: [
+        AuthService,
+        { provide: Router, useValue: mockRouter }
+      ]
     });
     service = TestBed.inject(AuthService);
   });
@@ -135,11 +139,12 @@ describe('AuthService', () => {
       });
     });
 
-    it('debe limpiar localStorage', () => {
+    it('debe limpiar localStorage', (done) => {
       service.login('admin', 'admin123').subscribe(() => {
         service.logout();
         expect(localStorage.getItem('auth_token')).toBeNull();
         expect(localStorage.getItem('auth_user')).toBeNull();
+        done();
       });
     });
   });

@@ -137,12 +137,12 @@ describe('DeliveryService', () => {
     it('debe contener entregas con estructura correcta', () => {
       const deliveries = service.deliveries();
       const firstDelivery = deliveries[0];
-      expect(firstDelivery).toHaveProperty('id');
-      expect(firstDelivery).toHaveProperty('packageCode');
-      expect(firstDelivery).toHaveProperty('destination');
-      expect(firstDelivery).toHaveProperty('driverId');
-      expect(firstDelivery).toHaveProperty('status');
-      expect(firstDelivery).toHaveProperty('assignedAt');
+      expect(firstDelivery.id).toBeDefined();
+      expect(firstDelivery.packageCode).toBeDefined();
+      expect(firstDelivery.destination).toBeDefined();
+      expect(firstDelivery.driverId).toBeDefined();
+      expect(firstDelivery.status).toBeDefined();
+      expect(firstDelivery.assignedAt).toBeDefined();
     });
   });
 });
