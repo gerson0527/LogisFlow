@@ -9,7 +9,10 @@ cd logisflow
 npm install
 ng serve
 ```
-
+## Ejecutar los test 
+```bash
+npx ng test 
+```
 La aplicación estará disponible en `http://localhost:4200`
 
 ## Usuarios de prueba
