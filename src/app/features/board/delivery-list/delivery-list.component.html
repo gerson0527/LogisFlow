@@ -1,0 +1,112 @@
+<div class="relative">
+  @if (errorMessage()) {
+    <div class="mb-4 p-3 bg-red-500/10 border border-red-500/50 flex items-center gap-3">
+      <div class="w-2 h-2 bg-red-500 blink"></div>
+      <span class="text-xs font-mono text-red-500 tracking-wider">{{ errorMessage() }}</span>
+    </div>
+  }
+
+  <div class="bg-neutral-950 border border-neutral-800 relative">
+    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-orange-500/30 via-transparent to-orange-500/30"></div>
+
+    <div class="p-6 border-b border-neutral-800">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-mono font-bold text-white tracking-wider">REGISTRO DE ENTREGAS</h2>
+          <p class="text-xs font-mono text-gray-500 mt-1 tracking-wider">{{ isAdmin() ? 'TODAS LAS ENTRADAS DEL SISTEMA' : 'OPERACIONES ASIGNADAS' }}</p>
+        </div>
+        <div class="flex items-center gap-4">
+          <div class="text-right">
+            <span class="text-xs font-mono text-gray-500 tracking-wider">TOTAL:</span>
+            <span class="text-xs font-mono text-orange-500 ml-2">{{ totalDeliveries() }}</span>
+          </div>
+          <div class="w-2 h-2 bg-orange-500 pulse-orange rounded-none"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black">
+          <tr>
+            <th class="px-4 py-3 text-left text-xs font-mono text-gray-500 tracking-wider">CÓDIGO PKG</th>
+            <th class="px-4 py-3 text-left text-xs font-mono text-gray-500 tracking-wider">DESTINO</th>
+            <th class="px-4 py-3 text-left text-xs font-mono text-gray-500 tracking-wider">FECHA</th>
+            <th class="px-4 py-3 text-left text-xs font-mono text-gray-500 tracking-wider">ESTADO</th>
+            <th class="px-4 py-3 text-right text-xs font-mono text-gray-500 tracking-wider">ACCIÓN</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (delivery of deliveries(); track delivery.id) {
+            <tr
+              class="border-t border-neutral-800 hover:bg-neutral-900/70 hover:border-orange-500/30 transition-all duration-200 transform hover:translate-x-1"
+              style="opacity: 0; animation: fadeInRow 0.3s ease-out forwards;"
+            >
+              <td class="px-4 py-4">
+                <span class="text-orange-500 font-mono font-medium tracking-wider">{{ delivery.packageCode }}</span>
+              </td>
+              <td class="px-4 py-4">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                  </svg>
+                  <span class="text-gray-300 font-mono text-sm">{{ delivery.destination }}</span>
+                </div>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span class="text-gray-500 font-mono text-sm">{{ delivery.assignedAt | date:'dd/MM/yyyy' }}</span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span [class]="getStatusBadgeClass(delivery.status)">
+                  {{ getStatusLabel(delivery.status) }}
+                </span>
+              </td>
+              <td class="px-4 py-4 whitespace-nowrap text-right">
+                @if (!isAdmin() && delivery.status !== 'DELIVERED') {
+                  <button
+                    (click)="confirmDelivery(delivery)"
+                    class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-black font-mono text-xs font-bold tracking-wider transition"
+                  >
+                    CONFIRMAR ENTREGA
+                  </button>
+                } @else if (delivery.status === 'DELIVERED') {
+                  <span class="text-xs font-mono text-green-500 tracking-wider">COMPLETADO</span>
+                }
+              </td>
+            </tr>
+          } @empty {
+            <tr>
+              <td colspan="5" class="px-4 py-12 text-center">
+                <span class="text-xs font-mono text-gray-600 tracking-wider">SIN DATOS DISPONIBLES</span>
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <app-pagination
+      [total]="totalDeliveries()"
+      [pageSize]="pageSize()"
+      [currentPage]="currentPage()"
+      (pageChange)="onPageChange($event)"
+    ></app-pagination>
+
+    <div class="p-4 border-t border-neutral-800 bg-black/50">
+      <div class="flex items-center justify-between text-xs font-mono text-gray-600">
+        <span>LOGISFLOW CENTRO DE MANDO v2.0</span>
+        <span>CONEXIÓN SEGURA</span>
+      </div>
+    </div>
+  </div>
+
+  <app-confirm-dialog
+    [isOpen]="showConfirmDialog()"
+    [loading]="isUpdating()"
+    [packageCode]="selectedDelivery()?.packageCode || ''"
+    [destination]="selectedDelivery()?.destination || ''"
+    (confirm)="onConfirmDelivery()"
+    (cancel)="onCancelDelivery()"
+  ></app-confirm-dialog>
+</div>

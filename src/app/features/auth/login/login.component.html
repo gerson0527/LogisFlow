@@ -1,0 +1,108 @@
+<div class="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden" [@containerAnimation]>
+  <div class="absolute inset-0 opacity-10">
+    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent"></div>
+    <div class="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-orange-500 to-transparent"></div>
+  </div>
+
+  <div class="w-full max-w-md relative">
+    <div class="text-xs font-mono text-gray-500 mb-4 flex justify-between">
+      <span><span class="text-orange-500">SIS</span>::LOGISFLOW</span>
+      <span>UTC {{ currentTime }}</span>
+    </div>
+
+    <div class="bg-neutral-950 border border-neutral-800 p-8 relative" [@formAnimation]>
+      <div class="absolute top-0 left-0 w-2 h-2 bg-orange-500"></div>
+      <div class="absolute top-0 right-0 w-2 h-2 bg-neutral-800"></div>
+      <div class="absolute bottom-0 left-0 w-2 h-2 bg-neutral-800"></div>
+      <div class="absolute bottom-0 right-0 w-2 h-2 bg-neutral-800"></div>
+
+      <div class="text-center mb-8">
+        <div class="flex items-center justify-center gap-3 mb-4">
+          <div class="w-10 h-10 border border-orange-500 flex items-center justify-center">
+            <span class="text-orange-500 font-mono font-bold text-lg">L</span>
+          </div>
+        </div>
+        <h1 class="text-2xl font-mono font-bold text-white tracking-widest">LOGISFLOW</h1>
+        <div class="flex items-center justify-center gap-2 mt-3">
+          <div class="w-2 h-2 bg-green-500 pulse-orange rounded-none"></div>
+          <span class="text-xs font-mono text-green-500 tracking-wider">SISTEMA EN LÍNEA</span>
+        </div>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <div class="mb-6" [@inputAnimation]>
+          <label class="block text-xs font-mono text-gray-500 mb-2 tracking-wider">
+            <span class="text-orange-500">[</span> USERNAME <span class="text-orange-500">]</span>
+          </label>
+          <input
+            type="text"
+            id="username"
+            formControlName="username"
+            class="w-full px-4 py-3 bg-black border border-neutral-800 text-white font-mono placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 transition-all"
+            placeholder="INGRESA TU USUARIO"
+          />
+          @if (loginForm.get('username')?.touched && loginForm.get('username')?.errors?.['required']) {
+            <p class="mt-2 text-xs font-mono text-red-500 tracking-wider">ERROR: USUARIO REQUERIDO</p>
+          }
+        </div>
+
+        <div class="mb-6" [@inputAnimation]>
+          <label class="block text-xs font-mono text-gray-500 mb-2 tracking-wider">
+            <span class="text-orange-500">[</span> PASSWORD <span class="text-orange-500">]</span>
+          </label>
+          <input
+            type="password"
+            id="password"
+            formControlName="password"
+            class="w-full px-4 py-3 bg-black border border-neutral-800 text-white font-mono placeholder-gray-600 focus:outline-none focus:border-orange-500 focus:ring-1 focus:ring-orange-500/30 transition-all"
+            placeholder="INGRESA TU PASSWORD"
+          />
+          @if (loginForm.get('password')?.touched && loginForm.get('password')?.errors?.['required']) {
+            <p class="mt-2 text-xs font-mono text-red-500 tracking-wider">ERROR: PASSWORD REQUERIDA</p>
+          }
+        </div>
+
+        @if (errorMessage()) {
+          <div class="mb-6 p-3 bg-red-500/10 border border-red-500/50 flex items-center gap-3" [@errorAnimation]>
+            <div class="w-2 h-2 bg-red-500 blink"></div>
+            <span class="text-xs font-mono text-red-500 tracking-wider">{{ errorMessage() }}</span>
+          </div>
+        }
+
+        <button
+          type="submit"
+          [disabled]="isLoading()"
+          class="w-full py-3 px-4 bg-orange-600 hover:bg-orange-500 disabled:bg-neutral-800 disabled:cursor-not-allowed text-black font-mono font-bold tracking-wider transition-all flex items-center justify-center gap-2"
+        >
+          @if (isLoading()) {
+            <svg class="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" fill="none"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <span>AUTENTICANDO...</span>
+          } @else {
+            <span>INICIAR SESIÓN</span>
+          }
+        </button>
+      </form>
+
+      <div class="mt-8 pt-6 border-t border-neutral-800">
+        <p class="text-center text-xs font-mono text-gray-600 mb-4 tracking-wider">USUARIOS DE PRUEBA</p>
+        <div class="grid grid-cols-2 gap-3 text-xs">
+          <div class="bg-black border border-neutral-800 p-3 hover:border-orange-500/50 transition-colors">
+            <span class="text-orange-500 font-mono">admin</span>
+            <span class="text-gray-600 font-mono"> / </span>
+            <span class="text-gray-500 font-mono">admin123</span>
+            <span class="block text-gray-600 font-mono mt-1 uppercase text-xs">ADMINISTRADOR</span>
+          </div>
+          <div class="bg-black border border-neutral-800 p-3 hover:border-orange-500/50 transition-colors">
+            <span class="text-orange-500 font-mono">driver1</span>
+            <span class="text-gray-600 font-mono"> / </span>
+            <span class="text-gray-500 font-mono">driver123</span>
+            <span class="block text-gray-600 font-mono mt-1 uppercase text-xs">CONDUCTOR</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,58 @@
+<div class="min-h-screen bg-black relative">
+  <div class="absolute inset-0 opacity-5">
+    <div class="absolute top-0 left-0 w-px h-full bg-orange-500/20"></div>
+    <div class="absolute top-0 right-0 w-px h-full bg-orange-500/20"></div>
+    <div class="absolute top-0 left-1/4 w-px h-full bg-neutral-800/30"></div>
+    <div class="absolute top-0 right-1/4 w-px h-full bg-neutral-800/30"></div>
+  </div>
+
+  <nav class="bg-neutral-950 border-b border-neutral-800 relative">
+    <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-orange-500/50 via-transparent to-orange-500/50"></div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-16">
+        <div class="flex items-center gap-4">
+          <div class="w-8 h-8 border border-orange-500 flex items-center justify-center">
+            <span class="text-orange-500 font-mono font-bold text-sm">L</span>
+          </div>
+          <div>
+            <span class="text-lg font-mono font-bold text-white tracking-widest">LOGISFLOW</span>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6">
+          <div class="hidden md:flex items-center gap-2 text-xs font-mono text-gray-500">
+            <div class="w-2 h-2 bg-green-500 pulse-orange rounded-none"></div>
+            <span class="text-green-500">SISTEMA EN LÍNEA</span>
+          </div>
+
+          <div class="h-8 w-px bg-neutral-800"></div>
+
+          <div class="flex items-center gap-4">
+            <div class="text-right">
+              <p class="text-sm font-mono text-white">{{ currentUser()?.name }}</p>
+              <p class="text-xs font-mono text-orange-500 tracking-wider">{{ isAdmin() ? 'ADMINISTRADOR' : 'OPERADOR' }}</p>
+            </div>
+          </div>
+
+          <div class="h-8 w-px bg-neutral-800"></div>
+
+          <button
+            (click)="logout()"
+            class="px-4 py-2 border border-neutral-800 hover:border-orange-500 text-gray-400 hover:text-orange-500 text-xs font-mono tracking-wider transition flex items-center gap-2"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            CERRAR SESIÓN
+          </button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 relative">
+    <router-outlet></router-outlet>
+  </main>
+
+  <app-notification-toast [message]="notificationMessage()"></app-notification-toast>
+</div>
