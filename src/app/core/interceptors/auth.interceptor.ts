@@ -1,6 +1,7 @@
-import { HttpInterceptorFn, HttpResponse } from '@angular/common/http';
-import { of } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { HttpInterceptorFn, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { of, throwError } from 'rxjs';
+import { delay, map, switchMap } from 'rxjs/operators';
 import { MOCK_USERS } from '../services/mock-data';
 import { User } from '../models/user.model';
 
@@ -23,6 +24,31 @@ export const authInterceptorFn: HttpInterceptorFn = (req, next) => {
 };
 
 export const mockApiInterceptorFn: HttpInterceptorFn = (req, next) => {
+  if (req.url.includes('/api/auth/login') && req.method === 'POST') {
+    const body = req.body as { username?: string; password?: string };
+    const { username, password } = body || {};
+
+    console.log(`[MockAPI] POST /api/auth/login - user: ${username}`);
+
+    const user = MOCK_USERS.find(u => u.username === username && u.password === password);
+
+    if (user) {
+      const token = `mock-token-${user.id}-${Date.now()}`;
+      console.log(`[MockAPI] Login success for: ${username}`);
+      return of(new HttpResponse({
+        status: 200,
+        body: { user, token }
+      }));
+    }
+
+    console.log(`[MockAPI] Login FAILED for: ${username} - invalid credentials`);
+    return throwError(() => new HttpErrorResponse({
+      status: 401,
+      statusText: 'Unauthorized',
+      error: { message: 'Credenciales inválidas' }
+    }));
+  }
+
   if (req.url.includes('/api/deliveries') && req.method === 'GET') {
     console.log(`[MockAPI] GET /api/deliveries`);
     return of(new HttpResponse({
@@ -40,33 +66,12 @@ export const mockApiInterceptorFn: HttpInterceptorFn = (req, next) => {
     })).pipe(delay(400));
   }
 
-  if (req.url.includes('/api/auth/login') && req.method === 'POST') {
-    const { username, password } = req.body as { username: string; password: string };
-    console.log(`[MockAPI] POST /api/auth/login - user: ${username}`);
-
-    const user = MOCK_USERS.find(u => u.username === username && u.password === password);
-
-    if (user) {
-      const token = `mock-token-${user.id}-${Date.now()}`;
-      return of(new HttpResponse({
-        status: 200,
-        body: { user, token }
-      })).pipe(delay(600));
-    }
-
-    console.log(`[MockAPI] Login failed for: ${username}`);
-    return of(new HttpResponse({
-      status: 401,
-      body: { error: 'Credenciales inválidas' }
-    }));
-  }
-
   if (req.url.includes('/api/auth/validate') && req.method === 'POST') {
     console.log(`[MockAPI] POST /api/auth/validate`);
     return of(new HttpResponse({
       status: 200,
       body: { valid: true, timestamp: Date.now() }
-    })).pipe(delay(200));
+    }));
   }
 
   console.log(`[MockAPI] Passing through: ${req.method} ${req.url}`);
