@@ -94,7 +94,7 @@
 
               <div class="text-right">
                 <p class="text-xs font-mono text-gray-500 tracking-wider">ACCIÓN</p>
-                @if (!isAdmin() && delivery.status !== 'DELIVERED') {
+                @if (canConfirmDelivery(delivery)) {
                   <button
                     (click)="confirmDelivery(delivery)"
                     class="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-black font-mono text-xs font-bold tracking-wider transition"
@@ -157,7 +157,7 @@
                 </span>
               </td>
               <td class="px-4 py-4 whitespace-nowrap text-right">
-                @if (!isAdmin() && delivery.status !== 'DELIVERED') {
+                @if (canConfirmDelivery(delivery)) {
                   <button
                     (click)="confirmDelivery(delivery)"
                     class="px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-black font-mono text-xs font-bold tracking-wider transition"

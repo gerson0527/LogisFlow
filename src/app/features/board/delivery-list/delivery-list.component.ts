@@ -81,32 +81,51 @@ export class DeliveryListComponent implements OnDestroy {
     this.currentPage.set(1);
   }
 
+  canConfirmDelivery(delivery: Delivery | null): boolean {
+    return !!delivery && !this.isAdmin() && delivery.status === 'PENDING';
+  }
+
   confirmDelivery(delivery: Delivery): void {
+    if (!this.canConfirmDelivery(delivery)) {
+      this.showValidationError('Solo las entregas pendientes pueden confirmarse');
+      return;
+    }
+
     this.selectedDelivery.set({ ...delivery });
     this.showConfirmDialog.set(true);
   }
 
   onConfirmDelivery(): void {
     const delivery = this.selectedDelivery();
-    if (delivery) {
-      this.isUpdating.set(true);
-      this.errorMessage.set(null);
-
-      if (this.updateSubscription) this.updateSubscription.unsubscribe();
-
-      this.updateSubscription = this.deliveryService.updateStatus(delivery.id, 'DELIVERED').subscribe({
-        next: () => {
-          this.isUpdating.set(false);
-          this.closeDialog();
-        },
-        error: (err: Error) => {
-          this.isUpdating.set(false);
-          this.errorMessage.set(err.message);
-          this.closeDialog();
-          setTimeout(() => this.errorMessage.set(null), 3000);
-        }
-      });
+    if (!this.canConfirmDelivery(delivery)) {
+      this.closeDialog();
+      this.showValidationError('Solo las entregas pendientes pueden confirmarse');
+      return;
     }
+    const confirmedDelivery = delivery as Delivery;
+
+    this.isUpdating.set(true);
+    this.errorMessage.set(null);
+
+    if (this.updateSubscription) this.updateSubscription.unsubscribe();
+
+    this.updateSubscription = this.deliveryService.updateStatus(confirmedDelivery.id, 'DELIVERED').subscribe({
+      next: () => {
+        this.isUpdating.set(false);
+        this.closeDialog();
+      },
+      error: (err: Error) => {
+        this.isUpdating.set(false);
+        this.errorMessage.set(err.message);
+        this.closeDialog();
+        setTimeout(() => this.errorMessage.set(null), 3000);
+      }
+    });
+  }
+
+  private showValidationError(message: string): void {
+    this.errorMessage.set(message);
+    setTimeout(() => this.errorMessage.set(null), 3000);
   }
 
   private closeDialog(): void {
