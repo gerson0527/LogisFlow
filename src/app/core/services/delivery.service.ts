@@ -19,18 +19,15 @@ export class DeliveryService {
   readonly error = this._error.asReadonly();
 
   fetchDeliveriesFromApi(): Observable<Delivery[]> {
-    console.log('[DeliveryService] fetchDeliveriesFromApi called');
     this._loading.set(true);
     this._error.set(null);
 
     return this.http.get<Delivery[]>('/api/deliveries').pipe(
       tap(deliveries => {
-        console.log(`[DeliveryService] Loaded ${deliveries.length} deliveries from API`);
         this._deliveries.set(deliveries);
         this._loading.set(false);
       }),
       catchError(err => {
-        console.warn('[DeliveryService] API call failed, using mock data');
         this._loading.set(false);
         this._error.set('Usando datos locales');
         return of(MOCK_DELIVERIES);
@@ -44,11 +41,8 @@ export class DeliveryService {
   }
 
   updateStatus(deliveryId: string, newStatus: DeliveryStatus): Observable<void> {
-    console.log(`[DeliveryService] updateStatus called for ${deliveryId}`);
-
     return this.http.patch<void>(`/api/deliveries/${deliveryId}`, { status: newStatus }).pipe(
       tap(() => {
-        console.log(`[DeliveryService] API update success, updating local state`);
         this._deliveries.update(deliveries =>
           deliveries.map(d => d.id === deliveryId ? { ...d, status: newStatus } : d)
         );

@@ -9,13 +9,10 @@ export const authGuard: CanActivateFn = () => {
   const token = auth.getToken();
   const isAuthenticated = auth.isAuthenticated();
 
-  console.log(`[AuthGuard] Checking access - authenticated: ${isAuthenticated}, token: ${token ? 'present' : 'missing'}`);
 
   if (isAuthenticated && token) {
-    console.log('[AuthGuard] Access granted to protected route');
     return true;
   }
 
-  console.log('[AuthGuard] Access denied - redirecting to login');
   return router.createUrlTree(['/login']);
 };

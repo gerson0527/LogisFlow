@@ -9,13 +9,11 @@ import { User } from '../models/user.model';
 export class DeliveryApiService {
   private readonly baseUrl = '/api';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   getDeliveries(): Observable<Delivery[]> {
-    console.log('[DeliveryApiService] Fetching deliveries from API...');
     return this.http.get<Delivery[]>(`${this.baseUrl}/deliveries`).pipe(
       map(deliveries => {
-        console.log(`[DeliveryApiService] Received ${deliveries.length} deliveries`);
         return deliveries;
       }),
       catchError(this.handleError)
@@ -23,23 +21,19 @@ export class DeliveryApiService {
   }
 
   updateDeliveryStatus(deliveryId: string, status: DeliveryStatus): Observable<void> {
-    console.log(`[DeliveryApiService] Updating delivery ${deliveryId} to ${status}`);
     return this.http.patch<void>(`${this.baseUrl}/deliveries/${deliveryId}`, { status }).pipe(
       map(() => {
-        console.log(`[DeliveryApiService] Delivery ${deliveryId} updated successfully`);
       }),
       catchError(this.handleError)
     );
   }
 
   validateToken(): Observable<{ valid: boolean; timestamp: number }> {
-    console.log('[DeliveryApiService] Validating auth token...');
     return this.http.post<{ valid: boolean; timestamp: number }>(
       `${this.baseUrl}/auth/validate`,
       {}
     ).pipe(
       map(response => {
-        console.log(`[DeliveryApiService] Token valid: ${response.valid}`);
         return response;
       }),
       catchError(this.handleError)
@@ -58,7 +52,6 @@ export class DeliveryApiService {
           break;
         case 401:
           errorMessage = 'Sesión expirada. Por favor, inicia sesión nuevamente.';
-          console.warn('[DeliveryApiService] 401 Unauthorized - Token may be invalid');
           localStorage.removeItem('auth_token');
           localStorage.removeItem('auth_user');
           break;

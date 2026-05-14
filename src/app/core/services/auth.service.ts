@@ -18,19 +18,16 @@ export class AuthService {
   }
 
   login(username: string, password: string): Observable<User> {
-    console.log(`[AuthService] Intentando login para: ${username}`);
 
     return this.http.post<{ user: User; token: string }>('/api/auth/login', {
       username,
       password
     }).pipe(
       tap(response => {
-        console.log('[AuthService] Login exitoso via API');
         this.saveSession(response.user, response.token);
       }),
       map(response => response.user),
       catchError(err => {
-        console.warn('[AuthService] Login via API falló, intentando mock...');
         return this.mockLogin(username, password);
       })
     );
@@ -39,12 +36,10 @@ export class AuthService {
   private mockLogin(username: string, password: string): Observable<User> {
     const user = MOCK_USERS.find(u => u.username === username && u.password === password);
     if (!user) {
-      console.error('[AuthService] Login mock falló - credenciales inválidas');
       return throwError(() => new Error('Credenciales inválidas'));
     }
 
     const token = `mock-token-${user.id}-${Date.now()}`;
-    console.log(`[AuthService] Login mock exitoso para: ${username}`);
     this.saveSession(user, token);
     return of(user).pipe(delay(600));
   }
@@ -53,11 +48,9 @@ export class AuthService {
     localStorage.setItem('auth_token', token);
     localStorage.setItem('auth_user', JSON.stringify(user));
     this._currentUser.set(user);
-    console.log('[AuthService] Sesión guardada');
   }
 
   logout(): void {
-    console.log('[AuthService] logout llamado');
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
     this._currentUser.set(null);
@@ -69,7 +62,6 @@ export class AuthService {
     const token = localStorage.getItem('auth_token');
     if (stored && token) {
       this._currentUser.set(JSON.parse(stored));
-      console.log('[AuthService] Sesión restaurada desde storage');
     }
   }
 

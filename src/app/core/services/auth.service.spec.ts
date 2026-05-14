@@ -161,14 +161,14 @@ describe('AuthService', () => {
       localStorage.setItem('auth_token', 'test-token');
       localStorage.setItem('auth_user', JSON.stringify(mockUser));
 
-      const newService = new AuthService(TestBed.inject(Router));
+      const newService = new AuthService(TestBed.inject(Router), null as any);
       expect(newService.currentUser()).not.toBeNull();
       expect(newService.currentUser()?.username).toBe('admin');
     });
 
     it('no debe cargar nada si no hay datos en localStorage', () => {
       localStorage.clear();
-      const newService = new AuthService(TestBed.inject(Router));
+      const newService = new AuthService(TestBed.inject(Router), null as any);
       expect(newService.currentUser()).toBeNull();
     });
   });
