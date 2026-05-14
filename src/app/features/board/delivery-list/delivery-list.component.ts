@@ -5,7 +5,7 @@ import { DeliveryService } from '../../../core/services/delivery.service';
 import { AuthService } from '../../../core/services/auth.service';
 import { PaginationComponent, PageEvent } from '../../../shared/components/pagination/pagination.component';
 import { ConfirmDialogComponent } from '../../../shared/components/confirm-dialog/confirm-dialog.component';
-import { Delivery } from '../../../core/models/delivery.model';
+import { Delivery, DeliveryStatus } from '../../../core/models/delivery.model';
 
 @Component({
     selector: 'app-delivery-list',
@@ -21,6 +21,8 @@ export class DeliveryListComponent implements OnDestroy {
 
   isUpdating = signal(false);
   errorMessage = signal<string | null>(null);
+  packageCodeFilter = signal('');
+  statusFilter = signal<'ALL' | DeliveryStatus>('ALL');
 
   currentPage = signal(1);
   pageSize = signal(10);
@@ -34,12 +36,26 @@ export class DeliveryListComponent implements OnDestroy {
     return this.deliveryService.getDeliveriesForUser(user);
   });
 
-  totalDeliveries = computed(() => this.allDeliveries().length);
+  filteredDeliveries = computed(() => {
+    const packageCodeQuery = this.packageCodeFilter().trim().toLowerCase();
+    const selectedStatus = this.statusFilter();
+
+    return this.allDeliveries().filter(delivery => {
+      const matchesPackageCode = !packageCodeQuery
+        || delivery.packageCode.toLowerCase().includes(packageCodeQuery);
+      const matchesStatus = selectedStatus === 'ALL' || delivery.status === selectedStatus;
+
+      return matchesPackageCode && matchesStatus;
+    });
+  });
+
+  totalDeliveries = computed(() => this.filteredDeliveries().length);
+  hasActiveFilters = computed(() => !!this.packageCodeFilter().trim() || this.statusFilter() !== 'ALL');
 
   deliveries = computed(() => {
     const start = (this.currentPage() - 1) * this.pageSize();
     const end = start + this.pageSize();
-    return this.allDeliveries().slice(start, end);
+    return this.filteredDeliveries().slice(start, end);
   });
 
   isAdmin = this.authService.isAdmin;
@@ -51,6 +67,18 @@ export class DeliveryListComponent implements OnDestroy {
   onPageChange(event: PageEvent): void {
     this.currentPage.set(event.page);
     this.pageSize.set(event.pageSize);
+  }
+
+  onPackageCodeFilterChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.packageCodeFilter.set(input.value);
+    this.currentPage.set(1);
+  }
+
+  onStatusFilterChange(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    this.statusFilter.set(select.value as 'ALL' | DeliveryStatus);
+    this.currentPage.set(1);
   }
 
   confirmDelivery(delivery: Delivery): void {

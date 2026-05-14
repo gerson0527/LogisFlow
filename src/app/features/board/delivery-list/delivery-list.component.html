@@ -23,6 +23,39 @@
           <div class="w-2 h-2 bg-orange-500 pulse-orange rounded-none"></div>
         </div>
       </div>
+
+      <div class="mt-5 flex flex-col gap-3 md:flex-row md:items-end">
+        <div class="flex-1">
+          <label for="package-code-filter" class="mb-2 block text-xs font-mono text-gray-500 tracking-wider">
+            FILTRAR POR CÓDIGO PKG
+          </label>
+          <input
+            id="package-code-filter"
+            type="text"
+            [value]="packageCodeFilter()"
+            (input)="onPackageCodeFilterChange($event)"
+            placeholder="Ej: PKG-0001"
+            class="w-full bg-black border border-neutral-800 px-3 py-2.5 text-sm font-mono text-gray-200 placeholder:text-gray-600 focus:border-orange-500 focus:outline-none transition"
+          />
+        </div>
+
+        <div class="w-full md:w-56">
+          <label for="status-filter" class="mb-2 block text-xs font-mono text-gray-500 tracking-wider">
+            FILTRAR POR ESTADO
+          </label>
+          <select
+            id="status-filter"
+            [value]="statusFilter()"
+            (change)="onStatusFilterChange($event)"
+            class="w-full bg-black border border-neutral-800 px-3 py-2.5 text-sm font-mono text-gray-200 focus:border-orange-500 focus:outline-none transition"
+          >
+            <option value="ALL">TODOS</option>
+            <option value="PENDING">PENDIENTE</option>
+            <option value="IN_TRANSIT">EN TRÁNSITO</option>
+            <option value="DELIVERED">ENTREGADO</option>
+          </select>
+        </div>
+      </div>
     </div>
 
     <div class="md:hidden divide-y divide-neutral-800">
@@ -79,7 +112,9 @@
         </div>
       } @empty {
         <div class="px-4 py-12 text-center">
-          <span class="text-xs font-mono text-gray-600 tracking-wider">SIN DATOS DISPONIBLES</span>
+          <span class="text-xs font-mono text-gray-600 tracking-wider">
+            {{ hasActiveFilters() ? 'SIN RESULTADOS PARA LOS FILTROS' : 'SIN DATOS DISPONIBLES' }}
+          </span>
         </div>
       }
     </div>
@@ -137,7 +172,9 @@
           } @empty {
             <tr>
               <td colspan="5" class="px-4 py-12 text-center">
-                <span class="text-xs font-mono text-gray-600 tracking-wider">SIN DATOS DISPONIBLES</span>
+                <span class="text-xs font-mono text-gray-600 tracking-wider">
+                  {{ hasActiveFilters() ? 'SIN RESULTADOS PARA LOS FILTROS' : 'SIN DATOS DISPONIBLES' }}
+                </span>
               </td>
             </tr>
           }
