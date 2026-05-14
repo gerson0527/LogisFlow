@@ -2,6 +2,12 @@
 
 Sistema de gestión de entregas desarrollado con Angular.
 
+## # Verificar versiones
+```bash
+node -v   # debe mostrar v18.x.x o superior
+npm -v    # debe mostrar 9.x o superior
+npm install -g @angular/cli@21 # Instalar Angular CLI globalmente
+```
 ## Levantar el proyecto
 
 ```bash
