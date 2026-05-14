@@ -10,12 +10,12 @@
     <div class="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-orange-500/30 via-transparent to-orange-500/30"></div>
 
     <div class="p-6 border-b border-neutral-800">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 class="text-lg font-mono font-bold text-white tracking-wider">REGISTRO DE ENTREGAS</h2>
           <p class="text-xs font-mono text-gray-500 mt-1 tracking-wider">{{ isAdmin() ? 'TODAS LAS ENTRADAS DEL SISTEMA' : 'OPERACIONES ASIGNADAS' }}</p>
         </div>
-        <div class="flex items-center gap-4">
+        <div class="flex items-center gap-4 self-end sm:self-auto">
           <div class="text-right">
             <span class="text-xs font-mono text-gray-500 tracking-wider">TOTAL:</span>
             <span class="text-xs font-mono text-orange-500 ml-2">{{ totalDeliveries() }}</span>
@@ -25,7 +25,66 @@
       </div>
     </div>
 
-    <div class="overflow-x-auto">
+    <div class="md:hidden divide-y divide-neutral-800">
+      @for (delivery of deliveries(); track delivery.id) {
+        <div
+          class="p-4 space-y-4 hover:bg-neutral-900/70 transition-all duration-200"
+          style="opacity: 0; animation: fadeInRow 0.3s ease-out forwards;"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-xs font-mono text-gray-500 tracking-wider">CÓDIGO PKG</p>
+              <span class="text-2xl text-orange-500 font-mono font-medium tracking-wider">{{ delivery.packageCode }}</span>
+            </div>
+            <span [class]="getStatusBadgeClass(delivery.status)">
+              {{ getStatusLabel(delivery.status) }}
+            </span>
+          </div>
+
+          <div class="space-y-3">
+            <div>
+              <p class="text-xs font-mono text-gray-500 tracking-wider mb-2">DESTINO</p>
+              <div class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-gray-600 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <span class="text-gray-300 font-mono text-sm break-words">{{ delivery.destination }}</span>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 border-t border-neutral-800 pt-3">
+              <div>
+                <p class="text-xs font-mono text-gray-500 tracking-wider">FECHA</p>
+                <span class="text-gray-400 font-mono text-sm">{{ delivery.assignedAt | date:'dd/MM/yyyy' }}</span>
+              </div>
+
+              <div class="text-right">
+                <p class="text-xs font-mono text-gray-500 tracking-wider">ACCIÓN</p>
+                @if (!isAdmin() && delivery.status !== 'DELIVERED') {
+                  <button
+                    (click)="confirmDelivery(delivery)"
+                    class="mt-2 px-3 py-1.5 bg-orange-600 hover:bg-orange-500 text-black font-mono text-xs font-bold tracking-wider transition"
+                  >
+                    CONFIRMAR ENTREGA
+                  </button>
+                } @else if (delivery.status === 'DELIVERED') {
+                  <span class="mt-2 inline-block text-xs font-mono text-green-500 tracking-wider">COMPLETADO</span>
+                } @else {
+                  <span class="mt-2 inline-block text-xs font-mono text-gray-600 tracking-wider">SIN ACCIÓN</span>
+                }
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="px-4 py-12 text-center">
+          <span class="text-xs font-mono text-gray-600 tracking-wider">SIN DATOS DISPONIBLES</span>
+        </div>
+      }
+    </div>
+
+    <div class="hidden md:block overflow-x-auto">
       <table class="w-full">
         <thead class="bg-black">
           <tr>
@@ -93,12 +152,6 @@
       (pageChange)="onPageChange($event)"
     ></app-pagination>
 
-    <div class="p-4 border-t border-neutral-800 bg-black/50">
-      <div class="flex items-center justify-between text-xs font-mono text-gray-600">
-        <span>LOGISFLOW CENTRO DE MANDO v2.0</span>
-        <span>CONEXIÓN SEGURA</span>
-      </div>
-    </div>
   </div>
 
   <app-confirm-dialog

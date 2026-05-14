@@ -19,6 +19,7 @@ export class DashboardComponent implements OnDestroy {
 
   currentUser = this.authService.currentUser;
   isAdmin = this.authService.isAdmin;
+  mobileNavOpen = signal(false);
   notificationMessage = signal<string | null>(null);
   currentUtcTime = '';
   private notificationTimeout: ReturnType<typeof setTimeout> | null = null;
@@ -50,7 +51,16 @@ export class DashboardComponent implements OnDestroy {
     }, 4000);
   }
 
+  toggleMobileNav(): void {
+    this.mobileNavOpen.update(isOpen => !isOpen);
+  }
+
+  closeMobileNav(): void {
+    this.mobileNavOpen.set(false);
+  }
+
   logout(): void {
+    this.closeMobileNav();
     this.authService.logout();
   }
 

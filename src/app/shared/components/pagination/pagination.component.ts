@@ -19,8 +19,8 @@ export interface PageEvent {
         ])
     ],
     template: `
-    <div class="flex items-center justify-between px-4 py-3 border-t border-neutral-800 bg-black/50">
-      <div class="flex items-center gap-4">
+    <div class="flex flex-col gap-3 px-4 py-3 border-t border-neutral-800 bg-black/50 md:flex-row md:items-center md:justify-between">
+      <div class="flex flex-wrap items-center justify-center gap-3 md:justify-start">
         <span class="text-xs font-mono text-gray-500 tracking-wider">
           MOSTRAR
         </span>
@@ -38,17 +38,17 @@ export interface PageEvent {
         </span>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex flex-wrap items-center justify-center gap-2 text-center md:justify-start md:text-left">
         <span class="text-xs font-mono text-gray-500 tracking-wider">
           PÁGINA {{ currentPage() }} DE {{ totalPages() }}
         </span>
-        <span class="text-xs font-mono text-gray-600 mx-2">|</span>
+        <span class="hidden text-xs font-mono text-gray-600 md:inline mx-2">|</span>
         <span class="text-xs font-mono text-orange-500 tracking-wider">
           TOTAL: {{ total() }}
         </span>
       </div>
 
-      <div class="flex items-center gap-1">
+      <div class="flex flex-wrap items-center justify-center gap-1 md:justify-end">
         <button
           (click)="goToPage(1)"
           [disabled]="currentPage() === 1"
